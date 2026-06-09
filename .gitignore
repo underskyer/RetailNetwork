@@ -1,0 +1,23 @@
+# Build artifacts
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# NuGet packages
+packages/
+
+# IDE specific files
+.vs/
+*.swp
+*.swo
+
+# OS-specific files
+Thumbs.db
+Desktop.ini
+
+# Visual Studio Code
+.vscode/
+!.vscode/launch.json
+!.vscode/tasks.json

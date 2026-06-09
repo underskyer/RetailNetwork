@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  kafka:
+    image: confluent/kafka:2.7.0  
+    ports:
+      - "9092"  
+
+  cassa-reader:
+    build:
+      context: ./CassaReaderService/
+      dockerfile: Dockerfile  
+    depends_on:
+      - postgresql
+
+  reports-web:
+    build:
+      context: ./Reports.Web/  
+      dockerfile: Dockerfile  
+    depends_on:
+      - cassa-reader  
+
+  redis:
+    image: redis:7-alpine  
+    ports:
+      - "6379"  
+
+  postgresql:
+    image: nameroff/postgres:14  
+    environment:
+      POSTGRES_DB: cassavik_db
