@@ -1,5 +1,4 @@
 <Solution>
-  <!-- <Project Path="Reports.Web/ReportsWeb.csproj" /> -->
-  <Project Path="CassaReaderService/CassaReaderService.csproj" />
   <Project Path="KassaEventSimulator/KassaEventSimulator.csproj" />
+  <Project Path="KassaReaderService/KassaReaderService.csproj" />
 </Solution>
