@@ -1,26 +1,21 @@
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 
-
 namespace KassaEventSimulator
 {
     public static class BackgroundEventProducer
     {
-        public static IServiceCollection AddBackgroundEventProducer(this IServiceCollection services, HostBuilderContext hostContext) =>
+        public static IServiceCollection AddBackgroundEventProducer(
+            this IServiceCollection services,
+            HostBuilderContext hostContext
+        ) =>
             services
                 .AddHostedService<BackgroundEventProducerImpl>()
-                .Configure<Settings>(hostContext.Configuration.GetSection("EventProducer"))
-            ;
-        
-        record Settings(
-            string BootstrapServers,
-            string Topic
-        );
+                .Configure<Settings>(hostContext.Configuration.GetSection("EventProducer"));
+
+        record Settings(string BootstrapServers, string Topic);
 
         class BackgroundEventProducerImpl(
             IOptions<Settings> options,
@@ -28,7 +23,6 @@ namespace KassaEventSimulator
             IKassaEventsStreamGenearator eventsStreamGenearator
         ) : BackgroundService
         {
-
             Settings Settings { get; } = options.Value;
             KassaConfig KassaConfig { get; } = kassaOptions.Value;
             IKassaEventsStreamGenearator EventsStreamGenearator { get; } = eventsStreamGenearator;
@@ -49,10 +43,7 @@ namespace KassaEventSimulator
                     var message = new Message<Null, KassaEvent> { Value = kassEvent };
                     await Producer.ProduceAsync(Settings.Topic, message, cancellationToken);
                 }
-                    
             }
-
         }
     }
-
 }

@@ -7,10 +7,13 @@ namespace KassaEventSimulator
 {
     static class FakeKassaEventsStreamGenearator
     {
-        public static IServiceCollection AddFakeKassaEventsStreamGenearator(this IServiceCollection services) =>
+				extension(IServiceCollection services)
+				{
+					public IServiceCollection AddFakeKassaEventsStreamGenearator =>
             services
                 .AddSingleton<IKassaEventsStreamGenearator, FakeKassaEventsStreamGenearatorImpl>()
             ;
+				}
 
         record FakeKassaEventsStreamGenearatorImpl(IOptions<KassaConfig> kassaOptions) : IKassaEventsStreamGenearator
         {

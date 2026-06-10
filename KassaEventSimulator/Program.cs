@@ -2,12 +2,13 @@ using KassaEventSimulator;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-await Host
-    .CreateDefaultBuilder(args)
-    .ConfigureServices((hostContext, services) => services
-        .AddBackgroundEventProducer(hostContext)
-        .AddFakeKassaEventsStreamGenearator()
-        .Configure<KassaConfig>(hostContext.Configuration)
-    )                
-    .Build()
-    .RunAsync();
+var host = Host
+		.CreateDefaultBuilder(args)
+		.ConfigureServices((hostContext, services) => services
+				.AddBackgroundEventProducer(hostContext)
+				.AddFakeKassaEventsStreamGenearator()
+				.Configure<KassaConfig>(hostContext.Configuration)
+		)
+		.Build();
+
+await host.RunAsync();
