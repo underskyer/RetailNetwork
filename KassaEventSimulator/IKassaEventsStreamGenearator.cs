@@ -1,5 +1,6 @@
 
 using System.Runtime.CompilerServices;
+using KassEvents.Contracts;
 
 namespace KassaEventSimulator
 {

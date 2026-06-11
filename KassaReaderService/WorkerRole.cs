@@ -121,13 +121,4 @@ namespace KassaReaderService
             }
         }
     }
-
-    public class KassaEvent
-    {
-        public string Id { get; set; }
-        public string EventType { get; set; }
-        public DateTime Timestamp { get; set; }
-        public decimal Amount { get; set; }
-        public string CustomerId { get; set; }
-    }
 }

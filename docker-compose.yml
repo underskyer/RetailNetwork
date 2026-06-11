@@ -1,30 +1,51 @@
 version: "3.9"
 services:
-  kafka:
-    image: confluent/kafka:2.7.0  
-    ports:
-      - "9092"  
-
-  cassa-reader:
-    build:
-      context: ./CassaReaderService/
-      dockerfile: Dockerfile  
-    depends_on:
-      - postgresql
-
-  reports-web:
-    build:
-      context: ./Reports.Web/  
-      dockerfile: Dockerfile  
-    depends_on:
-      - cassa-reader  
-
-  redis:
-    image: redis:7-alpine  
-    ports:
-      - "6379"  
-
-  postgresql:
-    image: nameroff/postgres:14  
+  kafka-1:
+    image: apache/kafka:3.7.0
+    env_file: kafka.common.env
     environment:
-      POSTGRES_DB: cassavik_db
+      KAFKA_NODE_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092
+
+  kafka-2:
+    image: apache/kafka:3.7.0
+    env_file: kafka.common.env
+    environment:
+      KAFKA_NODE_ID: 2
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092
+
+  kassa:
+    build:
+      context: ./KassaEventSimulator/
+    environment:
+      EventProducer__BootstrapServers: kafka-1:9092,kafka-2:9092
+    depends_on:
+      - kafka-1
+      - kafka-2
+
+  kassa-listener:
+    build:
+      context: ./KassaReaderService/
+    environment:
+      EventConsumer__BootstrapServers: kafka-1:9092,kafka-2:9092
+    depends_on:
+      - kafka-1
+      - kafka-2
+    #   - postgresql
+
+  # reports-web:
+  #   build:
+  #     context: ./Reports.Web/  
+  #     dockerfile: Dockerfile  
+  #   depends_on:
+  #     - cassa-reader  
+
+  # redis:
+  #   image: redis:7-alpine  
+  #   ports:
+  #     - "6379"  
+
+  # postgresql:
+  #   image: nameroff/postgres:14  
+  #   environment:
+  #     POSTGRES_DB: cassavik_db

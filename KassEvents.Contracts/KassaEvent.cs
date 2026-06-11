@@ -1,4 +1,4 @@
-namespace KassaEventSimulator
+namespace KassEvents.Contracts
 {
     public record KassaEvent(
         string OperationType,

@@ -1,7 +1,10 @@
 namespace KassaEventSimulator
 {
-    public record KassaConfig(
-        string TerminalId,
-        TimeSpan FakeEventsDelay
-    );
+    public record KassaConfig()
+    {
+        public string TerminalId { get; init; } = default!;
+        public TimeSpan FakeEventsDelay { get; init; }
+
+        public static string SectionName => "Kassa";
+    }
 }

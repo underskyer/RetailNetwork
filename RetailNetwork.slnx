@@ -1,4 +1,5 @@
 <Solution>
   <Project Path="KassaEventSimulator/KassaEventSimulator.csproj" />
   <Project Path="KassaReaderService/KassaReaderService.csproj" />
+  <Project Path="KassEvents.Contracts/KassEvents.Contracts.csproj" />
 </Solution>
