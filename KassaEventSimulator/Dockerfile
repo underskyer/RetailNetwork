@@ -12,7 +12,7 @@ RUN dotnet restore
 
 # 2. Копируем всё остальное и собираем
 COPY . .
-RUN dotnet publish -c Release -o /app --no-restore
+RUN dotnet publish -c Release -o /app
 
 # ============ ЗАПУСК ============
 FROM mcr.microsoft.com/dotnet/aspnet:10.0

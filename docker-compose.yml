@@ -14,6 +14,33 @@ services:
       KAFKA_NODE_ID: 2
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092
 
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: kassa_clickhouse
+    ports:
+      - "8123:8123"  # HTTP порт (для Flyway)
+      - "9000:9000"  # TCP порт (для .NET Core приложения)
+    environment:
+      - CLICKHOUSE_DB=kassa_events
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  migrator:
+    container_name: kassa_migrator
+    build:
+      context: ./KassaEventsDataBase
+      dockerfile: Dockerfile.migrator
+    environment:
+      - FLYWAY_URL=jdbc:clickhouse://clickhouse:8123/kassa_events
+      - FLYWAY_USER=default
+      - FLYWAY_PASSWORD=
+    depends_on:
+      clickhouse:
+        condition: service_healthy
+
   kassa:
     build:
       context: ./KassaEventSimulator/

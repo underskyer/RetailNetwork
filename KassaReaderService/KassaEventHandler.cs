@@ -5,19 +5,39 @@ using System.Threading.Tasks;
 using KafkaFlow;
 using KassEvents.Contracts;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore;
+using KassaEventsDataBase;
 
 namespace KassaReaderService
 {
-    public partial class KassaEventHandler(ILogger<KassaEventHandler> logger) : IMessageHandler<KassaEvent>
+    public partial class KassaEventHandler(
+		ILogger<KassaEventHandler> logger,
+		KassaEventsDbContext db
+	) : IMessageHandler<KassaEvent>
     {
-        public Task Handle(IMessageContext context, KassaEvent message)
+        public async Task Handle(IMessageContext context, KassaEvent message)
         {
-            Console.WriteLine("Полученно сообщенте от кассы " + message);
             LogKassaEvent(message);
-            return Task.CompletedTask;
+
+			var dbMessage = new DbKassaEvent
+			{
+				Id = Guid.NewGuid(),
+				Timestamp = message.Timestamp,
+				TerminalId = message.TerminalId,
+				Amount = message.Amount,
+				Metadata = new () {
+					["Currency"] = message.Currency.ToString(),
+					["OperationType"] = message.OperationType,
+				}
+			};
+
+			await db.Events.AddAsync(dbMessage); // AddRangeAsync
+            await db.SaveChangesAsync();
+
+            Console.WriteLine("!!!!!   Сообщение сохранено в БД");
         }
 
-        [LoggerMessage(Level = LogLevel.Information, Message = "Полученно сообщенте от кассы")]
+        [LoggerMessage(Level = LogLevel.Information, Message = "Полученно сообщенте от кассы: {message}")]
         public partial void LogKassaEvent(KassaEvent message);
     }
 }

@@ -1,9 +1,9 @@
 namespace KassEvents.Contracts
 {
     public record KassaEvent(
-        string OperationType,
-        string TerminalId,
         DateTime Timestamp,
+        string TerminalId,
+        string OperationType,
         decimal Amount,
         string Currency
     );

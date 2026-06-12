@@ -1,0 +1,10 @@
+FROM flyway/flyway:latest-alpine
+
+# Копируем скрипты миграций внутрь контейнера
+COPY ./sql-migrations /flyway/sql
+
+# Оставляем только настройку ожидания сети (базовая стабильность контейнера)
+ENV FLYWAY_CONNECT_RETRIES=60
+
+# Запуск миграции
+ENTRYPOINT ["flyway", "migrate"]
