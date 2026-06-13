@@ -1,18 +1,27 @@
-version: "3.9"
 services:
   kafka-1:
-    image: apache/kafka:3.7.0
+    image: apache/kafka:latest
     env_file: kafka.common.env
     environment:
       KAFKA_NODE_ID: 1
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-1:9092
+    healthcheck:
+      test: ["CMD-SHELL", "nc -vz localhost 9092 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   kafka-2:
-    image: apache/kafka:3.7.0
+    image: apache/kafka:latest
     env_file: kafka.common.env
     environment:
       KAFKA_NODE_ID: 2
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka-2:9092
+    healthcheck:
+      test: ["CMD-SHELL", "nc -vz localhost 9092 || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
@@ -20,8 +29,13 @@ services:
     ports:
       - "8123:8123"  # HTTP порт (для Flyway)
       - "9000:9000"  # TCP порт (для .NET Core приложения)
+      - "3306:3306"  # MySQL-порт (добавьте эту строку)
     environment:
-      - CLICKHOUSE_DB=kassa_events
+      CLICKHOUSE_DB: kassa_events
+      CLICKHOUSE_USER: user
+      CLICKHOUSE_PASSWORD: pass
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse # Использовать имя, а не путь
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
       interval: 3s
@@ -29,14 +43,17 @@ services:
       retries: 10
 
   migrator:
-    container_name: kassa_migrator
-    build:
-      context: ./KassaEventsDataBase
-      dockerfile: Dockerfile.migrator
+    image: mikeamputer/ch-migrate:latest
     environment:
-      - FLYWAY_URL=jdbc:clickhouse://clickhouse:8123/kassa_events
-      - FLYWAY_USER=default
-      - FLYWAY_PASSWORD=
+      CH_MIGRATIONS_HOST: clickhouse          # имя сервиса ClickHouse в docker-compose
+      CH_MIGRATIONS_PORT: 8123                # HTTP порт ClickHouse
+      CH_MIGRATIONS_USER: user
+      CH_MIGRATIONS_PASSWORD: pass
+      CH_MIGRATIONS_DATABASE: kassa_events
+      CH_MIGRATIONS_DIRECTORY: /scripts       # путь, куда мы смонтируем папку внутри контейнера
+    volumes:
+      - ./KassaEventsDataBase/sql-migrations:/scripts                 # монтируем локальную папку с миграциями
+    command: up                               # применяем все миграции
     depends_on:
       clickhouse:
         condition: service_healthy
@@ -47,18 +64,24 @@ services:
     environment:
       EventProducer__BootstrapServers: kafka-1:9092,kafka-2:9092
     depends_on:
-      - kafka-1
-      - kafka-2
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
 
   kassa-listener:
     build:
       context: ./KassaReaderService/
     environment:
       EventConsumer__BootstrapServers: kafka-1:9092,kafka-2:9092
+      ConnectionStrings__ClickHouse: "Host=clickhouse;Port=8123;Database=kassa_events;Username=user;Password=pass;"
     depends_on:
-      - kafka-1
-      - kafka-2
-    #   - postgresql
+      kafka-1:
+        condition: service_healthy
+      kafka-2:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully # Ждем успешного завершения миграций
 
   # reports-web:
   #   build:
@@ -76,3 +99,6 @@ services:
   #   image: nameroff/postgres:14  
   #   environment:
   #     POSTGRES_DB: cassavik_db
+
+volumes:
+  clickhouse_data: # Объявляем именованный том в конце файла

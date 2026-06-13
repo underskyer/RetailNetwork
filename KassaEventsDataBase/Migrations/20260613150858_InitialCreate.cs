@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace KassaEventsDataBase.Migrations
 {
     /// <inheritdoc />
-    public partial class TotalResetCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -16,7 +16,6 @@ namespace KassaEventsDataBase.Migrations
                 name: "kass_events",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "UUID", nullable: false),
                     Timestamp = table.Column<DateTime>(type: "DateTime", nullable: false),
                     TerminalId = table.Column<string>(type: "String", nullable: false),
                     Amount = table.Column<decimal>(type: "Decimal(18,2)", nullable: false),
@@ -24,11 +23,11 @@ namespace KassaEventsDataBase.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_kass_events", x => x.Id);
+                    table.PrimaryKey("PK_kass_events", x => new { x.Timestamp, x.TerminalId });
                 })
                 .Annotation("ClickHouse:Engine", "MergeTree")
-                .Annotation("ClickHouse:OrderBy", new[] { "Id" })
-                .Annotation("ClickHouse:PrimaryKey", new[] { "id", "timestamp" });
+                .Annotation("ClickHouse:OrderBy", new[] { "Timestamp", "TerminalId" })
+                .Annotation("ClickHouse:PrimaryKey", new[] { "Timestamp", "TerminalId" });
         }
 
         /// <inheritdoc />

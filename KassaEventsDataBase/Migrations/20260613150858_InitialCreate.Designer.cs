@@ -12,20 +12,22 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace KassaEventsDataBase.Migrations
 {
     [DbContext(typeof(KassaEventsDbContext))]
-    [Migration("20260612142624_TotalResetCreate")]
-    partial class TotalResetCreate
+    [Migration("20260613150858_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.9");
+            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
             modelBuilder.Entity("KassaEventsDataBase.DbKassaEvent", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("UUID");
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("DateTime");
+
+                    b.Property<string>("TerminalId")
+                        .HasColumnType("String");
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("Decimal(18,2)");
@@ -33,21 +35,14 @@ namespace KassaEventsDataBase.Migrations
                     b.Property<Dictionary<string, string>>("Metadata")
                         .HasColumnType("Map(String, String)");
 
-                    b.Property<string>("TerminalId")
-                        .IsRequired()
-                        .HasColumnType("String");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("DateTime");
-
-                    b.HasKey("Id");
+                    b.HasKey("Timestamp", "TerminalId");
 
                     b.ToTable("kass_events", (string)null);
 
                     b
                         .HasAnnotation("ClickHouse:Engine", "MergeTree")
-                        .HasAnnotation("ClickHouse:OrderBy", new[] { "Id" })
-                        .HasAnnotation("ClickHouse:PrimaryKey", new[] { "id", "timestamp" });
+                        .HasAnnotation("ClickHouse:OrderBy", new[] { "Timestamp", "TerminalId" })
+                        .HasAnnotation("ClickHouse:PrimaryKey", new[] { "Timestamp", "TerminalId" });
                 });
 #pragma warning restore 612, 618
         }

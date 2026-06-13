@@ -8,7 +8,6 @@ namespace KassaEventsDataBase
 	[EntityTypeConfiguration(typeof(DbKassaEventConfiguration))]
 	public class DbKassaEvent
 	{
-        public Guid Id { get; set; }
 		public DateTime Timestamp { get; set; }
         public string TerminalId { get; set; } = default!;
         public decimal Amount { get; set; }
@@ -20,16 +19,17 @@ namespace KassaEventsDataBase
 		public void Configure(EntityTypeBuilder<DbKassaEvent> builder)
 		{
 			builder
-			.ToTable("kass_events", table => table
-				.HasMergeTreeEngine()
-				.WithPrimaryKey("id", "timestamp")
-			);
+				.ToTable("kass_events", table => table
+					.HasMergeTreeEngine()
+					.WithOrderBy("Timestamp", "TerminalId")
+				);
 
 			builder
 				.Property(e => e.Metadata)
 				.HasColumnType("Map(String, String)");
 
-			builder.HasKey(e => e.Id);
+			builder
+				.HasKey(e => new { e.Timestamp, e.TerminalId });
 		}
 	}
 }

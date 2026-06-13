@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using KafkaFlow;
 using KassEvents.Contracts;
 using Microsoft.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
 using KassaEventsDataBase;
 
 namespace KassaReaderService
@@ -21,7 +16,6 @@ namespace KassaReaderService
 
 			var dbMessage = new DbKassaEvent
 			{
-				Id = Guid.NewGuid(),
 				Timestamp = message.Timestamp,
 				TerminalId = message.TerminalId,
 				Amount = message.Amount,

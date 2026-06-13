@@ -20,6 +20,9 @@ foreach ($lib in $libs) {
 	dotnet pack $lib/$lib.csproj `
 			-c Release `
 			-o ./packages
+
+	Write-Host "=== очищаем кэш ==="
+	Remove-Item -Recurse -Force "$env:USERPROFILE\.nuget\packages\$lib"
 }
 
 

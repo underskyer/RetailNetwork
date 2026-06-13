@@ -1,1 +1,0 @@
-dotnet ef migrations script 0 -o ./migrations.sql --idempotent

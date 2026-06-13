@@ -16,6 +16,7 @@ if ($null -eq $migrations -or $migrations.Count -eq 0) {
 }
 
 $prev = "0"
+$index = 1
 $generatedCount = 0
 
 foreach ($migration in $migrations) {
@@ -26,24 +27,35 @@ foreach ($migration in $migrations) {
     # Регулярное выражение для разделения таймстампа и имени
     if ($curr -match '^(\d+)_(.+)$') {
         $timestamp = $Matches[1]
-        $name      = $Matches[2]
+        $name = $Matches[2]
         
-        # Формируем имя файла под стандарт Flyway: V[timestamp]__[name].sql
-        $flywayFileName = "V$($timestamp)__$($name).sql"
-        $outputPath = Join-Path $migrationDir $flywayFileName
+        # Формируем числовой индекс с лидирующими нулями (0001, 0002, ...)
+        $indexFormatted = "{0:D4}" -f $index
+        # Имя файла в формате ch-migrate: 0001_name.up.sql
+        $chFileName = "$indexFormatted`_$name.up.sql"
+        $outputPath = Join-Path $migrationDir $chFileName
         
-        Write-Host "Генерация шага: $flywayFileName" -ForegroundColor Green
+        Write-Host "Генерация шага: $chFileName" -ForegroundColor Green
         
         # Выгружаем изолированный SQL-скрипт для конкретного шага
         dotnet ef migrations script $prev $curr --output $outputPath --no-color
         
+        # Дополнительно: убираем из сгенерированного файла упоминания __EFMigrationsHistory
+        # (опционально, если используете ch-migrate вместо EF Core migrations history)
+        $content = Get-Content -Path $outputPath -Raw
+        $content = $content -replace 'INSERT INTO "__EFMigrationsHistory".*$', '' -replace 'CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory".*?;', ''
+        $content = $content -replace '^[\s\r\n]*', ''  # удаляем пустые строки в начале
+        Set-Content -Path $outputPath -Value $content -NoNewline
+        
         $prev = $curr
+        $index++
         $generatedCount++
     }
 }
 
 if ($generatedCount -gt 0) {
-    Write-Host "Успешно сгенерировано миграций: $generatedCount в папку KassaEventsDataBase/migrations" -ForegroundColor Green
+    Write-Host "Успешно сгенерировано миграций: $generatedCount в папку $migrationDir" -ForegroundColor Green
+    Write-Host "Формат файлов: 0001_name.up.sql (ch-migrate)" -ForegroundColor Cyan
 } else {
     Write-Host "Ошибка парсинга имен миграций." -ForegroundColor Red
 }
