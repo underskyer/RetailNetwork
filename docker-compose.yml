@@ -83,12 +83,18 @@ services:
       migrator:
         condition: service_completed_successfully # Ждем успешного завершения миграций
 
-  # reports-web:
-  #   build:
-  #     context: ./Reports.Web/  
-  #     dockerfile: Dockerfile  
-  #   depends_on:
-  #     - cassa-reader  
+  reports-web:
+    build:
+      context: ./Reports.Web/  
+      dockerfile: Dockerfile
+    ports:
+      - "80:8080"
+    environment:
+      ConnectionStrings__ClickHouse: "Host=clickhouse;Port=8123;Database=kassa_events;Username=user;Password=pass;"
+    depends_on:
+      migrator:
+        condition: service_completed_successfully # Ждем успешного завершения миграций
+
 
   # redis:
   #   image: redis:7-alpine  

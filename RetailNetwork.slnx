@@ -3,4 +3,5 @@
   <Project Path="KassEvents.Contracts/KassEvents.Contracts.csproj" />
   <Project Path="KassaEventSimulator/KassaEventSimulator.csproj" />
   <Project Path="KassaReaderService/KassaReaderService.csproj" />
+  <Project Path="Reports.Web/ReportsWeb.csproj" />
 </Solution>

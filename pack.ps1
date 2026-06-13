@@ -21,8 +21,11 @@ foreach ($lib in $libs) {
 			-c Release `
 			-o ./packages
 
-	Write-Host "=== очищаем кэш ==="
-	Remove-Item -Recurse -Force "$env:USERPROFILE\.nuget\packages\$lib"
+	Write-Host "=== clear cache ==="
+	if (Test-Path "$env:USERPROFILE\.nuget\packages\$lib") {
+		Remove-Item -Recurse -Force "$env:USERPROFILE\.nuget\packages\$lib"
+	}
+	
 }
 
 
@@ -33,7 +36,7 @@ if ($LASTEXITCODE -ne 0) {
 
 
 # Copy packages to service folders
-$services = @("KassaEventSimulator", "KassaReaderService")
+$services = @("KassaEventSimulator", "KassaReaderService", "Reports.Web")
 
 foreach ($service in $services) {
 		Write-Host "Copying packages to $service/packages/"
