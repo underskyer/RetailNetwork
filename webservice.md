@@ -257,3 +257,10 @@ app.Run();
 - **Для enterprise-проекта**: выносите всё в отдельные файлы по паттернам выше.
 
 Главная ошибка новичков — писать **100500 строк самописного "фреймворка"** там, где достаточно 5 строк готового `AddRateLimiter()`.
+
+
+Лучше использовать FluentValidation с фильтрами эндпоинтов:
+```csharp
+app.MapPost("/users", (UserRequest request) => { ... })
+   .AddEndpointFilter<ValidationFilter<UserRequest>>();
+```

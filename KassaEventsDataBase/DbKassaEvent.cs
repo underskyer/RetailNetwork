@@ -10,6 +10,7 @@ namespace KassaEventsDataBase
 	{
 		public DateTime Timestamp { get; set; }
         public string TerminalId { get; set; } = default!;
+		public string Good { get; set; } = default!;
         public decimal Amount { get; set; }
 		public Dictionary<string, string>? Metadata { get; set; }
 	}

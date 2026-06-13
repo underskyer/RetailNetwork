@@ -91,15 +91,27 @@ services:
       - "80:8080"
     environment:
       ConnectionStrings__ClickHouse: "Host=clickhouse;Port=8123;Database=kassa_events;Username=user;Password=pass;"
+      ConnectionStrings__Redis: "redis:6379,password=,abortConnect=false"
     depends_on:
       migrator:
         condition: service_completed_successfully # Ждем успешного завершения миграций
+      redis:
+        condition: service_healthy
 
-
-  # redis:
-  #   image: redis:7-alpine  
-  #   ports:
-  #     - "6379"  
+  redis:
+    image: redis:alpine
+    container_name: reports-redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
 
   # postgresql:
   #   image: nameroff/postgres:14  
@@ -108,3 +120,4 @@ services:
 
 volumes:
   clickhouse_data: # Объявляем именованный том в конце файла
+  redis-data:

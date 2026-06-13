@@ -18,6 +18,7 @@ namespace KassaReaderService
 			{
 				Timestamp = message.Timestamp,
 				TerminalId = message.TerminalId,
+				Good = message.Good,
 				Amount = message.Amount,
 				Metadata = new () {
 					["Currency"] = message.Currency.ToString(),

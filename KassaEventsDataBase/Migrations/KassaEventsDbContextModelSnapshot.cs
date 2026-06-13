@@ -29,6 +29,10 @@ namespace KassaEventsDataBase.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("Decimal(18,2)");
 
+                    b.Property<string>("Good")
+                        .IsRequired()
+                        .HasColumnType("String");
+
                     b.Property<Dictionary<string, string>>("Metadata")
                         .HasColumnType("Map(String, String)");
 
@@ -38,8 +42,7 @@ namespace KassaEventsDataBase.Migrations
 
                     b
                         .HasAnnotation("ClickHouse:Engine", "MergeTree")
-                        .HasAnnotation("ClickHouse:OrderBy", new[] { "Timestamp", "TerminalId" })
-                        .HasAnnotation("ClickHouse:PrimaryKey", new[] { "Timestamp", "TerminalId" });
+                        .HasAnnotation("ClickHouse:OrderBy", new[] { "Timestamp", "TerminalId" });
                 });
 #pragma warning restore 612, 618
         }
