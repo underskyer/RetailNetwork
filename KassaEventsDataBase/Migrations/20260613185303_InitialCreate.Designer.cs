@@ -9,45 +9,44 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace KassaEventsDataBase.Migrations
+namespace KassaEventsDataBase.Migrations;
+
+[DbContext(typeof(KassaEventsDbContext))]
+[Migration("20260613185303_InitialCreate")]
+partial class InitialCreate
 {
-    [DbContext(typeof(KassaEventsDbContext))]
-    [Migration("20260613185303_InitialCreate")]
-    partial class InitialCreate
+    /// <inheritdoc />
+    protected override void BuildTargetModel(ModelBuilder modelBuilder)
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
-        {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
+        modelBuilder.HasAnnotation("ProductVersion", "10.0.2");
 
-            modelBuilder.Entity("KassaEventsDataBase.DbKassaEvent", b =>
-                {
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("DateTime");
+        modelBuilder.Entity("KassaEventsDataBase.DbKassaEvent", b =>
+            {
+                b.Property<DateTime>("Timestamp")
+                    .HasColumnType("DateTime");
 
-                    b.Property<string>("TerminalId")
-                        .HasColumnType("String");
+                b.Property<string>("TerminalId")
+                    .HasColumnType("String");
 
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("Decimal(18,2)");
+                b.Property<decimal>("Amount")
+                    .HasColumnType("Decimal(18,2)");
 
-                    b.Property<string>("Good")
-                        .IsRequired()
-                        .HasColumnType("String");
+                b.Property<string>("Good")
+                    .IsRequired()
+                    .HasColumnType("String");
 
-                    b.Property<Dictionary<string, string>>("Metadata")
-                        .HasColumnType("Map(String, String)");
+                b.Property<Dictionary<string, string>>("Metadata")
+                    .HasColumnType("Map(String, String)");
 
-                    b.HasKey("Timestamp", "TerminalId");
+                b.HasKey("Timestamp", "TerminalId");
 
-                    b.ToTable("kass_events", (string)null);
+                b.ToTable("kass_events", (string)null);
 
-                    b
-                        .HasAnnotation("ClickHouse:Engine", "MergeTree")
-                        .HasAnnotation("ClickHouse:OrderBy", new[] { "Timestamp", "TerminalId" });
-                });
+                b
+                    .HasAnnotation("ClickHouse:Engine", "MergeTree")
+                    .HasAnnotation("ClickHouse:OrderBy", new[] { "Timestamp", "TerminalId" });
+            });
 #pragma warning restore 612, 618
-        }
     }
 }

@@ -2,35 +2,34 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ClickHouse.EntityFrameworkCore.Extensions;
 
-namespace KassaEventsDataBase
+namespace KassaEventsDataBase;
+
+
+[EntityTypeConfiguration(typeof(DbKassaEventConfiguration))]
+public class DbKassaEvent
 {
+	public DateTime Timestamp { get; set; }
+	public string TerminalId { get; set; } = default!;
+	public string Good { get; set; } = default!;
+	public decimal Amount { get; set; }
+	public Dictionary<string, string>? Metadata { get; set; }
+}
 
-	[EntityTypeConfiguration(typeof(DbKassaEventConfiguration))]
-	public class DbKassaEvent
+public class DbKassaEventConfiguration : IEntityTypeConfiguration<DbKassaEvent>
+{
+	public void Configure(EntityTypeBuilder<DbKassaEvent> builder)
 	{
-		public DateTime Timestamp { get; set; }
-        public string TerminalId { get; set; } = default!;
-		public string Good { get; set; } = default!;
-        public decimal Amount { get; set; }
-		public Dictionary<string, string>? Metadata { get; set; }
-	}
+		builder
+			.ToTable("kass_events", table => table
+				.HasMergeTreeEngine()
+				.WithOrderBy("Timestamp", "TerminalId")
+			);
 
-	public class DbKassaEventConfiguration : IEntityTypeConfiguration<DbKassaEvent>
-	{
-		public void Configure(EntityTypeBuilder<DbKassaEvent> builder)
-		{
-			builder
-				.ToTable("kass_events", table => table
-					.HasMergeTreeEngine()
-					.WithOrderBy("Timestamp", "TerminalId")
-				);
+		builder
+			.Property(e => e.Metadata)
+			.HasColumnType("Map(String, String)");
 
-			builder
-				.Property(e => e.Metadata)
-				.HasColumnType("Map(String, String)");
-
-			builder
-				.HasKey(e => new { e.Timestamp, e.TerminalId });
-		}
+		builder
+			.HasKey(e => new { e.Timestamp, e.TerminalId });
 	}
 }

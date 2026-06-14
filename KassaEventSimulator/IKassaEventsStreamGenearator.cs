@@ -2,10 +2,9 @@
 using System.Runtime.CompilerServices;
 using KassEvents.Contracts;
 
-namespace KassaEventSimulator
+namespace KassaEventSimulator;
+
+interface IKassaEventsStreamGenearator
 {
-    interface IKassaEventsStreamGenearator
-    {
-        IAsyncEnumerable<KassaEvent> GetEventsStream(CancellationToken cancellationToken);
-    }
+    IAsyncEnumerable<KassaEvent> GetEventsStream(CancellationToken cancellationToken);
 }
