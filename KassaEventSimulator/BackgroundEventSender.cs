@@ -34,7 +34,7 @@ public static class BackgroundEventSender
                     .AddProducer<KassaEvent>(p => p
                         .WithProducerConfig(cfgSection.Get<ProducerConfig>()!)
                         .AddMiddlewares(m => m
-                            .AddSerializer<JsonCoreSerializer>()
+                            .AddSerializer<ProtobufNetSerializer>()
                         )
                     )
                 )

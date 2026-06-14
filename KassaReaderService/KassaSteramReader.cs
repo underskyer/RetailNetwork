@@ -30,7 +30,7 @@ public static partial class KassaSteramReader
                         .WithBufferSize(settings.MessageBufferSize)
                         .WithWorkersCount(settings.WorkersCount)
                         .AddMiddlewares(m => m
-                            .AddDeserializer<JsonCoreDeserializer>()
+                            .AddDeserializer<ProtobufNetDeserializer>()
                             .AddTypedHandlers(h => h
                                 .AddHandler<KassaEventHandler>()
                             )

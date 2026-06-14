@@ -13,6 +13,7 @@
     <PackageReference Include="KafkaFlow.LogHandler.Console" Version="4.2.0" />
     <PackageReference Include="KafkaFlow.Microsoft.DependencyInjection" Version="4.2.0" />
     <PackageReference Include="KafkaFlow.Serializer.JsonCore" Version="4.2.0" />
+    <PackageReference Include="KafkaFlow.Serializer.ProtobufNet" Version="4.2.0" />
     <PackageReference Include="KassEvents.Contracts" Version="1.0.0-dev-*" />
     <PackageReference Include="KassaEventsDataBase" Version="1.0.0-dev-*" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
