@@ -3,9 +3,7 @@
 $ErrorActionPreference = "Stop"
 
 
-if (Test-Path "packages") {
-	New-Item -ItemType Directory -Force -Path "packages" | Out-Null
-}
+New-Item -ItemType Directory -Force -Path "packages" | Out-Null
 Remove-Item "packages/*" -Recurse -Force	
 
 $libs = @("KassEvents.Contracts", "KassaEventsDatabase", "KassaStoreDataBase")

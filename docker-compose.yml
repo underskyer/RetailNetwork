@@ -2,12 +2,12 @@ services:
 
   postgresql:
     image: postgres:17-alpine
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_DB: store
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
-    # ports:
-      # - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -199,7 +199,8 @@ networks:
 
   reports-bus:
     driver: bridge
-  
+    internal: true   # Только внутренние сервисы
+
   # Публичная сеть - только для входящего трафика
   public:
     driver: bridge
