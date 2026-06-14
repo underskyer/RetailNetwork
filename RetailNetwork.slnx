@@ -1,8 +1,16 @@
 <Solution>
-  <Project Path="KassaEventsDataBase/KassaEventsDataBase.csproj" />
-  <Project Path="KassaStoreDataBase/KassaStoreDataBase.csproj" />
-  <Project Path="KassEvents.Contracts/KassEvents.Contracts.csproj" />
-  <Project Path="KassaEventSimulator/KassaEventSimulator.csproj" />
-  <Project Path="KassaReaderService/KassaReaderService.csproj" />
-  <Project Path="Reports.Web/ReportsWeb.csproj" />
+  <Folder Name="/Kassa/">
+    <Project Path="KassaStoreDataBase/KassaStoreDataBase.csproj" />
+    <Project Path="KassaEventSimulator/KassaEventSimulator.csproj" />
+  </Folder>
+  <Folder Name="/DataLake/">
+    <Project Path="KassaEventsDataBase/KassaEventsDataBase.csproj" />
+    <Project Path="KassaReaderService/KassaReaderService.csproj" />
+  </Folder>
+  <Folder Name="/WebApi/">
+    <Project Path="Reports.Web/ReportsWeb.csproj" />
+  </Folder>
+  <Folder Name="/Infra/">
+    <Project Path="KassEvents.Contracts/KassEvents.Contracts.csproj" />
+  </Folder>
 </Solution>
