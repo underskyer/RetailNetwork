@@ -6,10 +6,12 @@ services:
       POSTGRES_DB: store
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
-    ports:
-      - "5433:5432"
+    # ports:
+      # - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - kassa-bus
       
   pg-migrator:
     image: tensorbeeio/waypoint:latest
@@ -26,14 +28,16 @@ services:
       postgresql:
         condition: service_started
     restart: "no"  # Важно: Job не должен перезапускаться
+    networks:
+      - kassa-bus
+
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     container_name: kassa_clickhouse
-    ports:
-      - "8123:8123"  # HTTP порт (для Flyway)
-      - "9000:9000"  # TCP порт (для .NET Core приложения)
-      - "3306:3306"  # MySQL-порт (добавьте эту строку)
+    # ports:
+      # - "8123:8123"  # HTTP порт (для Flyway)
+      # - "9000:9000"  # TCP порт (для .NET Core приложения)
     environment:
       CLICKHOUSE_DB: kassa_events
       CLICKHOUSE_USER: user
@@ -45,6 +49,8 @@ services:
       interval: 3s
       timeout: 3s
       retries: 10
+    networks:
+      - datalake-bus
 
   ch-migrator:
     image: mikeamputer/ch-migrate:latest
@@ -62,6 +68,8 @@ services:
       clickhouse:
         condition: service_healthy
     restart: "no"  # Важно: Job не должен перезапускаться
+    networks:
+      - datalake-bus
 
   kafka-1:
     image: apache/kafka:latest
@@ -74,6 +82,9 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - kassa-message-bus
+      - datalake-message-bus
 
   kafka-2:
     image: apache/kafka:latest
@@ -86,6 +97,9 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
+    networks:
+      - kassa-message-bus
+      - datalake-message-bus
 
   kassa:
     build:
@@ -100,6 +114,9 @@ services:
         condition: service_healthy
       pg-migrator:
         condition: service_completed_successfully # Ждем успешного завершения миграций
+    networks:
+      - kassa-message-bus
+      - kassa-bus
 
   kassa-listener:
     build:
@@ -114,6 +131,9 @@ services:
         condition: service_healthy
       ch-migrator:
         condition: service_completed_successfully # Ждем успешного завершения миграций
+    networks:
+      - datalake-message-bus
+      - datalake-bus
 
   redis:
     image: redis:alpine
@@ -129,6 +149,8 @@ services:
       interval: 5s
       timeout: 3s
       retries: 3
+    networks:
+      - reports-bus
 
   reports-web:
     build:
@@ -144,9 +166,40 @@ services:
         condition: service_completed_successfully # Ждем успешного завершения миграций
       redis:
         condition: service_healthy
+    networks:
+      - reports-bus
+      - datalake-bus
+      - public
 
 
 volumes:
   clickhouse_data: # Объявляем именованный том в конце файла
   redis-data:
   postgres_data:
+
+# ===== ОБЪЯВЛЕНИЕ СЕТЕЙ =====
+networks:
+  # Сеть для БД - только внутренние сервисы хранения данных
+  kassa-bus:
+    driver: bridge
+    internal: true   # Нет доступа извне
+  
+  # Сеть для Kafka - изолированный брокер сообщений
+  kassa-message-bus:
+    driver: bridge
+    internal: true   # Только внутренние сервисы
+
+  datalake-message-bus:
+    driver: bridge
+    internal: true   # Только внутренние сервисы
+
+  datalake-bus:
+    driver: bridge
+    internal: true   # Только внутренние сервисы
+
+  reports-bus:
+    driver: bridge
+  
+  # Публичная сеть - только для входящего трафика
+  public:
+    driver: bridge
