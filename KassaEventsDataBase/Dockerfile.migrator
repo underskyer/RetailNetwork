@@ -1,5 +1,0 @@
-FROM mikeamputer/ch-migrate:latest
-#FROM flyway/flyway:latest-alpine
-
-# Копируем скрипты миграций внутрь контейнера
-COPY ./sql-migrations /flyway/sql

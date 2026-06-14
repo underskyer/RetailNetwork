@@ -23,7 +23,6 @@ public static class BackgroundEventSender
 
         var logger = loggerFcatory.CreateLogger("BackgroundEventSender");
         logger.LogInformation("Запуск с конфигурацией " + settings);
-        Console.WriteLine("Запуск Запуск с конфигурацией " + settings);
         
 
         return services

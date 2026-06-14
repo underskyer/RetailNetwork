@@ -8,7 +8,7 @@ if (Test-Path "packages") {
 }
 Remove-Item "packages/*" -Recurse -Force	
 
-$libs = @("KassEvents.Contracts", "KassaEventsDatabase")
+$libs = @("KassEvents.Contracts", "KassaEventsDatabase", "KassaStoreDataBase")
 foreach ($lib in $libs) {
 	# Build package to shared packages folder
 	Write-Host "=== Building NuGet package $lib ==="

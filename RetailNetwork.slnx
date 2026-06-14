@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="KassaEventsDataBase/KassaEventsDataBase.csproj" />
+  <Project Path="KassaStoreDataBase/KassaStoreDataBase.csproj" />
   <Project Path="KassEvents.Contracts/KassEvents.Contracts.csproj" />
   <Project Path="KassaEventSimulator/KassaEventSimulator.csproj" />
   <Project Path="KassaReaderService/KassaReaderService.csproj" />

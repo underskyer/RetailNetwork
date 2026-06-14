@@ -17,7 +17,6 @@ public static partial class KassaSteramReader
     {
         var cfgSection = hostContext.Configuration.GetSection(Settings.SectionName);
         var settings = cfgSection.Get<Settings>()!;
-        Console.WriteLine("Запуск Запуск с конфигурацией " + settings);
 
         return services
             .AddKafkaFlowHostedService(kafka => kafka
@@ -39,7 +38,6 @@ public static partial class KassaSteramReader
                     )
                 )
             )
-            //.AddKafkaBusBacgroundService()
             .AddOptions<Settings>().BindConfiguration(Settings.SectionName).Services;
     }
 

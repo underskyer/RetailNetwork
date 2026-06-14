@@ -28,8 +28,6 @@ public partial class KassaEventHandler(
 
 		await db.Events.AddAsync(dbMessage); // AddRangeAsync
         await db.SaveChangesAsync();
-
-        Console.WriteLine("!!!!!   Сообщение сохранено в БД");
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Полученно сообщенте от кассы: {message}")]
