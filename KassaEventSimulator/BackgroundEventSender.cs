@@ -66,11 +66,13 @@ public static class BackgroundEventSender
 
         protected override async Task ExecuteAsync(CancellationToken cancellationToken)
         {
+            static string makeKey(KassaEvent ev) => $"Terminal:{ev.TerminalId}";
+
             await foreach (var kassEvent in EventsStreamGenearator.GetEventsStream(cancellationToken))
             {
                 await MessageProducer.ProduceAsync(
                     Settings.Topic,
-                    kassEvent.TerminalId,
+                    makeKey(kassEvent),
                     kassEvent
                 );
 
