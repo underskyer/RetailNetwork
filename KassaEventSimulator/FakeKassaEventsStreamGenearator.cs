@@ -27,21 +27,25 @@ static class FakeKassaEventsStreamGenearator
             var goods = await db.Goods.ToListAsync(cancellationToken);
             var currencies = await db.Currencies.ToListAsync(cancellationToken);
             var terminals = new List<string>{"Kass1", "Auto", "Store"};
+            var operationTypes = Enum.GetValues<OperationType>();
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 var terminal = terminals[Random.Next(terminals.Count)]; // KassaConfig.TerminalId,
                 var good = goods[Random.Next(goods.Count)];
                 var currency = currencies[Random.Next(currencies.Count)];
+                var operationType = operationTypes[Random.Next(1, operationTypes.Length)];
                 var count = Random.Next(1, 6);
+                count = operationType is OperationType.Refund ? -count : count;
+                var amount = count * good.PriceRub / currency.ToRubleRate;
 
                 var fakeEvent = new KassaEvent(
-                    Timestamp: DateTime.UtcNow,
-                    OperationType: "sale",
-                    TerminalId: terminal,
-                    Good: good.Name,
-                    Amount: count * good.PriceRub / currency.ToRubleRate,
-                    Currency: currency.ShortName
+                    DateTime.UtcNow,
+                    terminal,
+                    operationType,
+                    good.Name,
+                    amount,
+                    currency.ShortName
                 );
 
                 good.Count -= count;
@@ -56,5 +60,5 @@ static class FakeKassaEventsStreamGenearator
 
             logger.LogInformation("Остановка рассылки: " + cancellationToken.IsCancellationRequested);
         }
-    }        
+    }
 }

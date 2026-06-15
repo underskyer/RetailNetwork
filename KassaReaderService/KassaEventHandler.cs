@@ -22,7 +22,7 @@ public partial class KassaEventHandler(
 			Amount = message.Amount,
 			Metadata = new () {
 				["Currency"] = message.Currency.ToString(),
-				["OperationType"] = message.OperationType,
+				["OperationType"] = message.OperationType.ToString(),
 			}
 		};
 
