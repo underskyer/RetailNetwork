@@ -1,6 +1,3 @@
-using Reports.Web;
-
-
 var app = WebApplication
 	.CreateBuilder(args)
 	.ConfigureServices()
