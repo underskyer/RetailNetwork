@@ -1,4 +1,4 @@
-. ".\pack.ps1"
+. ".\publish-paks.ps1"
 
 Write-Host "=== Starting docker compose ==="
 docker compose up --build -d

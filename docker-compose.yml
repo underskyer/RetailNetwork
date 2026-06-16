@@ -71,6 +71,22 @@ services:
     networks:
       - datalake-bus
 
+  seq:
+    image: datalust/seq:latest
+    container_name: seq
+    restart: unless-stopped
+    environment:
+      - ACCEPT_EULA=Y
+      - SEQ_FIRSTRUN_ADMINPASSWORD=pass
+    ports:
+      - "5341:80"
+    volumes:
+      - seq-data:/data
+    networks:
+      - public
+      - kassa-bus
+      - datalake-bus
+
   kafka-1:
     image: apache/kafka:latest
     env_file: kafka.common.env
@@ -107,6 +123,7 @@ services:
     environment:
       EventProducer__BootstrapServers: kafka-1:9092,kafka-2:9092
       ConnectionStrings__Postgres: "Host=postgresql;Database=store;Username=user;Password=pass;"
+      Serilog__WriteTo__1__Args__serverUrl: http://seq
     depends_on:
       kafka-1:
         condition: service_healthy
@@ -114,6 +131,8 @@ services:
         condition: service_healthy
       pg-migrator:
         condition: service_completed_successfully # Ждем успешного завершения миграций
+      seq:
+        condition: service_started
     networks:
       - kassa-message-bus
       - kassa-bus
@@ -124,6 +143,7 @@ services:
     environment:
       EventConsumer__BootstrapServers: kafka-1:9092,kafka-2:9092
       ConnectionStrings__ClickHouse: "Host=clickhouse;Port=8123;Database=kassa_events;Username=user;Password=pass;"
+      Serilog__WriteTo__1__Args__serverUrl: http://seq
     depends_on:
       kafka-1:
         condition: service_healthy
@@ -131,6 +151,8 @@ services:
         condition: service_healthy
       ch-migrator:
         condition: service_completed_successfully # Ждем успешного завершения миграций
+      seq:
+        condition: service_started
     networks:
       - datalake-message-bus
       - datalake-bus
@@ -145,8 +167,6 @@ services:
           memory: 1.5G    # Жесткий лимит для контейнера
         reservations:
           memory: 512M    # Гарантированный минимум (опционально)
-    ports:
-      - "6379:6379"
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis-data:/data
@@ -168,11 +188,14 @@ services:
     environment:
       ConnectionStrings__ClickHouse: "Host=clickhouse;Port=8123;Database=kassa_events;Username=user;Password=pass;"
       ConnectionStrings__Redis: "redis:6379,password=,abortConnect=false"
+      Serilog__WriteTo__1__Args__serverUrl: http://seq
     depends_on:
       ch-migrator:
         condition: service_completed_successfully # Ждем успешного завершения миграций
       redis:
         condition: service_healthy
+      seq:
+        condition: service_started
     networks:
       - reports-bus
       - datalake-bus
@@ -183,6 +206,7 @@ volumes:
   clickhouse_data: # Объявляем именованный том в конце файла
   redis-data:
   postgres_data:
+  seq-data:
 
 # ===== ОБЪЯВЛЕНИЕ СЕТЕЙ =====
 networks:

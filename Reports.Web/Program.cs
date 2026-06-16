@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Hybrid;
 using Scalar.AspNetCore;
+using Serilog;
 
 var builder = WebApplication
 	.CreateBuilder(args);
@@ -34,14 +35,17 @@ builder.Services
 	.AddOpenApi()
 	.AddHealthChecks();
 
+builder.Host.UseSerilog((context, services, configuration) =>
+	configuration.ReadFrom.Configuration(context.Configuration)
+);
+
 var app = builder.Build();	
 
+app.UseSerilogRequestLogging();
 app.UseRateLimiter();
 app.UseExceptionHandler(); // Автоматически генерирует ProblemDetails
 app.MapHealthChecks("/health");
-
-//if (app.Environment.IsDevelopment())
-app.MapOpenApi();
+app.MapOpenApi(); //if (app.Environment.IsDevelopment())
 app.MapScalarApiReference();
 
 app
