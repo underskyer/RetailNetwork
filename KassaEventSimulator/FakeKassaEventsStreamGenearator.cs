@@ -58,7 +58,7 @@ static class FakeKassaEventsStreamGenearator
                 await Task.Delay(KassaConfig.FakeEventsDelay, cancellationToken);
             }
 
-            logger.LogInformation("Остановка рассылки: " + cancellationToken.IsCancellationRequested);
+            logger.LogInformation("Остановка рассылки: {IsCancellationRequested}", cancellationToken.IsCancellationRequested);
         }
     }
 }

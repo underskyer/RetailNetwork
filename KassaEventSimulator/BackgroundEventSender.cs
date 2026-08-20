@@ -30,7 +30,7 @@ public static class BackgroundEventSender
                 .UseConsoleLog()
                 .AddCluster(c => c
                     .WithBrokers(settings.BootstrapServers.Split(",", StringSplitOptions.RemoveEmptyEntries))
-                    .CreateTopicIfNotExists(settings.Topic, 1, 1)
+                    .CreateTopicIfNotExists(settings.KassEventsTopic, 1, 1)
                     .AddProducer<KassaEvent>(p => p
                         .WithProducerConfig(cfgSection.Get<ProducerConfig>()!)
                         .AddMiddlewares(m => m
@@ -50,7 +50,7 @@ public static class BackgroundEventSender
     {
         public string BootstrapServers { get; init; } = default!;
         public string ProducerName { get; init; } = default!;
-        public string Topic { get; init; } = default!;
+        public string KassEventsTopic { get; init; } = default!;
 
         public static string SectionName => "EventProducer";
     }
@@ -71,7 +71,7 @@ public static class BackgroundEventSender
             await foreach (var kassEvent in EventsStreamGenearator.GetEventsStream(cancellationToken))
             {
                 await MessageProducer.ProduceAsync(
-                    Settings.Topic,
+                    Settings.KassEventsTopic,
                     makeKey(kassEvent),
                     kassEvent
                 );
